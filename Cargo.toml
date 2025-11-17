@@ -1,0 +1,21 @@
+[package]
+authors = ["Cyrus Gahatraj <cyrusgahatraj301@gmail.com>"]
+name = "bare_os"
+version = "0.1.0"
+edition = "2024"
+
+# Instruction for not building binary in test and bench mode 
+[[bin]]
+name = "bare_os"
+test = false
+bench = false
+
+# Disabling stack unwinding on panic in Dev profile
+[profile.dev]
+panic = "abort"
+
+# Disabling stack unwinding on panic in Release profile
+[profile.release]
+panic = "abort"
+
+[dependencies]
