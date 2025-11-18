@@ -3,6 +3,11 @@
 A minimal operating system written in Rust for learning purposes,
 from Philipp Oppermann’s [Writing an OS in Rust](https://os.phil-opp.com/) series.
 
+## Prerequisite
+- **Rust** nightly toolchain
+- **QEMU** (x86_64 emulator)
+- **bootimage** tool (for creating bootable disk images)
+
 ##  Target Architecture
 
 | Field  | Meaning                           |
@@ -26,3 +31,12 @@ rustup target add thumbv7em-none-eabihf
 cargo build --target thumbv7em-none-eabihf
 ```
 
+3. Run the Kernel
+
+```bash
+cargo run
+```
+* Manual (using Qemu directly)
+```bash
+qemu-system-x86_64 -drive format=raw,file=target/x86_64-bare_os/debug/bootimage-bare_os.bin        
+```
