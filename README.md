@@ -7,36 +7,24 @@ from Philipp Oppermann’s [Writing an OS in Rust](https://os.phil-opp.com/) ser
 - **Rust** nightly toolchain
 - **QEMU** (x86_64 emulator)
 - **bootimage** tool (for creating bootable disk images)
-
-##  Target Architecture
-
-| Field  | Meaning                           |
-| ------ | --------------------------------- |
-| arch   | thumb (ARM Thumb instruction set) |
-| sub    | v7em (Cortex-M4 / M7)             |
-| vendor | none                              |
-| sys    | (bare-metal / no OS)              |
-| env    | eabihf (Embedded ABI, hard-float) |
+- **llvm tool** to build the bootimage from [x86_64-bare_os.json](https://github.com/Cyrus-Gahatraj/bare_os/blob/main/x86_64-bare_os.json)
+    ```bash
+    rustup component add llvm-tools-preview
+    ```
 
 
 ## Build Instructions
-1. Adding Rust Target
-
+1. Building the kernel
 ```bash
-rustup target add thumbv7em-none-eabihf
+cargo build 
 ```
 
-2. Build the OS kernel
-```bash
-cargo build --target thumbv7em-none-eabihf
-```
-
-3. Run the Kernel
-
+2. Run the Kernel
+- Run using Cargo (Recommended)
 ```bash
 cargo run
 ```
-* Manual (using Qemu directly)
+- Run manually (using Qemu directly)
 ```bash
 qemu-system-x86_64 -drive format=raw,file=target/x86_64-bare_os/debug/bootimage-bare_os.bin        
 ```
