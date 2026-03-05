@@ -1,17 +1,20 @@
 CC=nasm
 FLAGS=-f bin
-BUILD=build
+BUILD_DIR=build
 SRC=src/boot_loader/boot.asm
-BIN=$(BUILD)/boot.bin
+TARGET=$(BUILD_DIR)/boot.bin
 
-all: $(BIN)
+all: $(TARGET)
 
-$(BIN): $(SRC)
-	mkdir $(BUILD)
-	$(CC) $(SRC) $(FLAGS) -o $(BIN)
+$(TARGET): $(SRC) | $(BUILD_DIR)
+	$(CC) $(SRC) $(FLAGS) -o $(TARGET)
+
+$(BUILD_DIR): 
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(BUILD_DIR)
 
-run: $(BIN)
-	qemu-system-x86_64 -drive format=raw,file=$(BIN) -display gtk
+run: $(TARGET)
+	qemu-system-x86_64 -drive format=raw,file=$(TARGET) -display gtk
+	
