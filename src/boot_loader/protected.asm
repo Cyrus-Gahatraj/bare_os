@@ -26,8 +26,20 @@ end_print:
 	ret
 
 start_protected_mode:
+	mov ax, DATA_SEG
+	mov ss, ax
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	mov esp, 0x9000
+	mov ebp, esp
+
 	call print_on_protected_mode
-	jmp $
+	.loop:
+		hlt
+		jmp .loop 
 
 HELLO: db "Hello World", 0
 
