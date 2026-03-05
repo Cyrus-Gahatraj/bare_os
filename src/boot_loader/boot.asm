@@ -1,5 +1,6 @@
 ; Load the code exactly in 0x7c00
 ; which is the sector which the BIOS looks to load
+[bits 16]			; Currently on 16 real mode
 [org 0x7c00] 
 
 start:
@@ -13,29 +14,30 @@ main:
 	mov al, 0x01	; Number of sector
 	call disk_load
 
-	jmp second_sector
+	cli		; clear all interrup
+	lgdt  [GDT_descriptor]
 
-	; Loop for eternity
-	loop:
-		hlt
-		jmp loop
+	; Change last bit of cr0 to 1
+	mov eax, cr0
+	or eax, 1
+	mov cr0, eax	; Now CPU on 32 bit protected mode
+
+	; Jump to another segment (far jump)
+	jmp CODE_SEG:start_protected_mode
 
 ; Include the .asm file
 %include "./src/boot_loader/print.asm"
 %include "./src/boot_loader/disk.asm"
+%include "./src/boot_loader/gdt.asm"
+%include "./src/boot_loader/protected.asm"
 
 ; 0 for floppy
 ; 0x80 for hard drive (for qemu)
 BOOT_DRIVE: db 0x80
-SECOND_SEC: db "In second sector"
 	
 ; 510 bytes and the magic number
 times 510 - ($ - $$) db 0
 dw 0xaa55
-
-second_sector:
-	mov si, SECOND_SEC
-	call print_string
 
 ; Extra Sector
 times 512 db 0
