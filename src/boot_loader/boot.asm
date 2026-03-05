@@ -21,8 +21,8 @@ main:
 		jmp loop
 
 ; Include the .asm file
-%include "print.asm"
-%include "disk.asm"
+%include "./src/boot_loader/print.asm"
+%include "./src/boot_loader/disk.asm"
 
 ; 0 for floppy
 ; 0x80 for hard drive (for qemu)
