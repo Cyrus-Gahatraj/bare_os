@@ -1,39 +1,56 @@
 ASM=nasm
-ASM_FLAGS=-f bin
+ASM_FLAGS_OBJ=-f elf64 
+ASM_FLAGS_BIN=-f bin
+
+CC=gcc
+CFLAGS=-ffreestanding -c 
+
 BUILD_DIR=build
+KERNEL_DIR=src/kernel
+
+# Files
 BOOT_LOADER=src/boot_loader/boot.asm
 BOOT_BIN=$(BUILD_DIR)/boot.bin
 
-CC=gcc
-FLAGS=-ffreestanding -c
-KERNEL=src/kernel/kernel.c
-OBJ_FILE=src/kernel/kernel.o
+ENTRY_SRC=$(KERNEL_DIR)/entry.asm
+ENTRY_OBJ=$(KERNEL_DIR)/entry.o
+
+KERNEL_SRC=$(KERNEL_DIR)/kernel.c
+KERNEL_OBJ=$(KERNEL_DIR)/kernel.o
+
+KERNEL_BIN=$(BUILD_DIR)/kernel.bin
+TARGET=$(BUILD_DIR)/os-image
+
+# Linker
 LINKER=ld
 LINKER_FLAGS=-Ttext 0x1000 --oformat binary
-KERNEL_BIN=$(BUILD_DIR)/kernel.bin
 
-TARGET=$(BUILD_DIR)/os-image
+# qemu
+QEMU=qemu-system-x86_64
 
 all: $(TARGET)
 
 $(TARGET): $(BOOT_BIN) $(KERNEL_BIN)
-	cat $(BOOT_BIN) $(KERNEL_BIN) > $(TARGET)
+	cat $^ > $(TARGET)
 
 $(BOOT_BIN): $(BOOT_LOADER) | $(BUILD_DIR)
-	$(ASM) $(BOOT_LOADER) $(ASM_FLAGS) -o $@
+	$(ASM) $< $(ASM_FLAGS_BIN) -o $@
 
-$(OBJ_FILE): $(KERNEL)
-	$(CC) $(FLAGS) $(KERNEL) -o $(OBJ_FILE)
+$(ENTRY_OBJ): $(ENTRY_SRC)
+	$(ASM) $< $(ASM_FLAGS_OBJ) -o $@
 
-$(KERNEL_BIN): $(OBJ_FILE)
-	$(LINKER) $(LINKER_FLAGS) $< -o $@
+$(KERNEL_OBJ): $(KERNEL_SRC)
+	$(CC) $(CFLAGS) $< -o $@
 
-$(BUILD_DIR): 
+$(KERNEL_BIN): $(ENTRY_OBJ) $(KERNEL_OBJ)
+	$(LINKER) $(LINKER_FLAGS) $^ -o $@
+
+$(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) $(KERNEL_BIN) $(OBJ_FILE)
+	rm -rf $(BUILD_DIR) $(OBJ_FILES)
 
 run: $(TARGET)
-	qemu-system-x86_64 -drive format=raw,file=$(TARGET) -display gtk
+	$(QEMU) -drive format=raw,file=$< -display gtk
 	
