@@ -9,7 +9,7 @@ disk_load:
 	mov bx, 0
 	mov es, bx
 	pop bx			; Restore BX from the stack
-	mov bx, 0x7e00	; 512 bytes after 0x7c00
+	mov bx, KERNEL_OFFSET	
 	int 0x13		; BIOS interrupt for disk
 
 	jc disk_error	; Jump if error ( i.e. carry flag set )

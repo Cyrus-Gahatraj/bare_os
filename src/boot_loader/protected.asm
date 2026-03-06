@@ -5,7 +5,6 @@ WHITE_ON_BLACK equ 0x0f		; White text on black bg
 print_on_protected_mode:
 	pusha
 	mov edx, VIDEO_MEMORY
-	mov ebx, HELLO
 
 print_loop:
 	mov al, [ebx]
@@ -36,10 +35,11 @@ start_protected_mode:
 	mov esp, 0x9000
 	mov ebp, esp
 
+	mov ebx, PROTECTED_MODE
 	call print_on_protected_mode
+	call KERNEL_OFFSET
+
 	.loop:
 		hlt
 		jmp .loop 
-
-HELLO: db "Hello World", 0
 
